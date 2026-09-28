@@ -1,0 +1,32 @@
+name: OpenAPI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# GITHUB_TOKEN может только читать код
+permissions:
+  contents: read
+
+# В PR новый коммит отменяет проверку старого, в main запуски идут по очереди
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    name: OpenAPI lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      # Все файлы *openapi*.yaml в репозитории: сейчас api/openapi.yaml и contracts/ml-service.openapi.yaml.
+      # Репозиторий подключается в контейнер в /spec, рабочую папку образа redocly/cli
+      - name: Lint specs
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/spec \
+            redocly/cli:2.54.3 \
+            lint --format=github-actions $(git ls-files '*openapi*.yaml')
