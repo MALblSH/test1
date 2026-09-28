@@ -658,6 +658,16 @@ components:
         type: string
       example: 'dv_session=; Path=/api/v1; Max-Age=0'
 paths:
+  /broken/{id}:
+    get:
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoesNotExist'
+
   /search/image:
     post:
       operationId: searchByImage
