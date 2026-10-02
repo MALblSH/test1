@@ -97,7 +97,7 @@ jobs:
   build-image:
     name: build-image
     needs: [detect, check-migrations]
-    if: needs.detect.outputs.dockerfile == 'true'
+    if: ${{ !cancelled() && !failure() && needs.detect.outputs.dockerfile == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
